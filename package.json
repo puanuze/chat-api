@@ -18,11 +18,13 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "fastest-validator": "^1.10.0",
+    "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
     "koa-pino-logger": "^3.0.0",
     "koa-router": "^8.0.8",
-    "mongoose": "^6.2.9"
+    "mongoose": "^6.2.9",
+    "socket.io": "^4.4.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",

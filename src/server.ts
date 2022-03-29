@@ -1,7 +1,9 @@
 import logger from 'koa-pino-logger'
+import http from 'http'
 import initApp, { IAppConfig } from './app'
 import { PORT } from './config'
 import { initDatabase } from './database'
+import io from './socket'
 
 async function start() {
   const loggingMiddleware = logger({ autoLogging: false })
@@ -14,8 +16,11 @@ async function start() {
       loggingMiddleware,
     }
     const app = initApp(appConfig)
+    const server = http.createServer(app.callback())
 
-    const server = app.listen(PORT, () => {
+    io.attach(server)
+
+    server.listen(PORT, () => {
       log.info(`Server started at port ${PORT}`)
     })
 
