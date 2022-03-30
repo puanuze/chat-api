@@ -8,7 +8,6 @@ const io = new Server({
 
 io.use((socket: any, next) => {
   const { username } = socket.handshake.auth
-  console.log('Here username', username)
   if (!username) {
     next(new Error('Invalid username'))
   }
@@ -18,15 +17,36 @@ io.use((socket: any, next) => {
   next()
 })
 
-io.on('connection', (socket) => {
+io.on('connection', (socket: any) => {
   const users: any = []
   io.of('/').sockets.forEach((item: any) => {
     users.push({
-      userID: item.id,
+      id: item.id,
       username: item.username,
+      connected: true,
     })
   })
+
   socket.emit('users', users)
+  socket.broadcast.emit('user connected', {
+    id: socket.id,
+    username: socket.username,
+    connected: true,
+  })
+
+  socket.on('disconnect', () => {
+    socket.broadcast.emit('user disconnected', {
+      id: socket.id,
+      username: socket.username,
+    })
+  })
+
+  socket.on('private message', ({ content, to }: any) => {
+    socket.to(to).emit('private message', {
+      content,
+      from: socket.id,
+    })
+  })
 })
 
 export default io
