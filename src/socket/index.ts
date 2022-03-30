@@ -11,28 +11,38 @@ const io = new Server({
 })
 
 io.use(async (socket: any, next) => {
-  const { userId, sessionId } = socket.handshake.auth.sessionId
+  const { userId, sessionId } = socket.handshake.auth
+
+  if (!userId && !sessionId) {
+    next(new Error('invalid request'))
+  }
+
+  let session
   if (sessionId) {
-    const session = await SessionRepository.findSession(sessionId)
-    if (session) {
-      socket.sessionId = session.sessionId
-      socket.userId = session.user._id.toJSON()
-      next()
-    }
+    session = await SessionRepository.findSession(sessionId)
+  } else {
+    session = await SessionRepository.findSessionForUser(userId)
   }
-  const { username } = socket.handshake.auth
-  if (!username) {
-    next(new Error('invalid username'))
+
+  if (session) {
+    socket.sessionId = session.sessionId
+    socket.userId = session.user._id.toJSON()
+    socket.username = session.user.username
+    next()
   }
+
   // create new session
-  const session = await SessionRepository.addSession(userId)
-  socket.sessionId = session._id
+  session = await SessionRepository.addSession(userId)
+  socket.sessionId = session.sessionId
   socket.userId = session.user._id.toJSON()
+  socket.username = session.user.username
 
   next()
 })
 
 io.on('connection', (socket: any) => {
+  socket.join(socket.userId)
+
   const users: any = []
   io.of('/').sockets.forEach((item: any) => {
     users.push({
