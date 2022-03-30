@@ -1,10 +1,10 @@
-import { User as UserModel, Session as SessionModel } from '../models'
 import { v4 } from 'uuid'
+import { Session as SessionModel } from '../models'
 
 type Session = {
   _id: string
   sessionId: string
-  userId: string
+  user: any
 }
 
 export class SessionRepository {
@@ -14,6 +14,6 @@ export class SessionRepository {
   }
 
   static async findSession(sessionId: string): Promise<Session> {
-    return UserModel.findOne({ sessionId }).populate('User').exec()
+    return SessionModel.findOne({ sessionId }).populate('user').exec()
   }
 }

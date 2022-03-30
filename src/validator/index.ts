@@ -1,5 +1,5 @@
 import Validator from 'fastest-validator'
-import { UserLoginSchema, UserRegisterSchema } from './schemas/user'
+import { UserRegisterSchema } from './schemas/user'
 
 const validator = new Validator({
   useNewCustomCheckerFunction: true,
@@ -20,4 +20,3 @@ const validator = new Validator({
 
 // User
 export const UserRegisterValidator = validator.compile(UserRegisterSchema)
-export const UserLoginValidator = validator.compile(UserLoginSchema)

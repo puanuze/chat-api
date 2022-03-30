@@ -1,3 +1,6 @@
+/* eslint no-param-reassign: "error" */
+/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
+
 import { Server } from 'socket.io'
 import { SessionRepository } from '../database/repository'
 
@@ -13,18 +16,18 @@ io.use(async (socket: any, next) => {
     const session = await SessionRepository.findSession(sessionId)
     if (session) {
       socket.sessionId = session.sessionId
-      socket.userId = session.userId
-      return next()
+      socket.userId = session.user._id.toJSON()
+      next()
     }
   }
-  const username = socket.handshake.auth.username
+  const { username } = socket.handshake.auth
   if (!username) {
-    return next(new Error('invalid username'))
+    next(new Error('invalid username'))
   }
   // create new session
   const session = await SessionRepository.addSession(userId)
   socket.sessionId = session._id
-  socket.userId = session.userId
+  socket.userId = session.user._id.toJSON()
 
   next()
 })
