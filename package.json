@@ -15,19 +15,17 @@
   "dependencies": {
     "@koa/cors": "^3.1.0",
     "@sentry/node": "^6.4.0",
-    "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "fastest-validator": "^1.10.0",
-    "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
     "koa-pino-logger": "^3.0.0",
     "koa-router": "^8.0.8",
     "mongoose": "^6.2.9",
-    "socket.io": "^4.4.1"
+    "socket.io": "^4.4.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.2",
     "@types/jest": "^26.0.20",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/koa": "^2.11.6",
@@ -36,6 +34,7 @@
     "@types/koa-pino-logger": "^3.0.0",
     "@types/koa-router": "^7.4.1",
     "@types/node": "^14.14.7",
+    "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^4.7.0",
     "@typescript-eslint/parser": "^4.7.0",
     "eslint": "^7.13.0",

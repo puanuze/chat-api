@@ -1,4 +1,5 @@
 import { Server } from 'socket.io'
+import { SessionRepository } from '../database/repository'
 
 const io = new Server({
   cors: {
@@ -6,14 +7,25 @@ const io = new Server({
   },
 })
 
-io.use((socket: any, next) => {
-  const { username } = socket.handshake.auth
-  if (!username) {
-    next(new Error('Invalid username'))
+io.use(async (socket: any, next) => {
+  const { userId, sessionId } = socket.handshake.auth.sessionId
+  if (sessionId) {
+    const session = await SessionRepository.findSession(sessionId)
+    if (session) {
+      socket.sessionId = session.sessionId
+      socket.userId = session.userId
+      return next()
+    }
   }
+  const username = socket.handshake.auth.username
+  if (!username) {
+    return next(new Error('invalid username'))
+  }
+  // create new session
+  const session = await SessionRepository.addSession(userId)
+  socket.sessionId = session._id
+  socket.userId = session.userId
 
-  /* eslint no-param-reassign: "error" */
-  socket.username = username
   next()
 })
 
@@ -27,13 +39,23 @@ io.on('connection', (socket: any) => {
     })
   })
 
+  // Emit sessionId and userId
+  socket.emit('session', {
+    sessionId: socket.sessionId,
+    userId: socket.userId,
+  })
+
+  // Emit active users
   socket.emit('users', users)
+
+  // Handle user connect
   socket.broadcast.emit('user connected', {
     id: socket.id,
     username: socket.username,
     connected: true,
   })
 
+  // Handle user disconnect
   socket.on('disconnect', () => {
     socket.broadcast.emit('user disconnected', {
       id: socket.id,
@@ -41,10 +63,12 @@ io.on('connection', (socket: any) => {
     })
   })
 
+  // Handle private message
   socket.on('private message', ({ content, to }: any) => {
-    socket.to(to).emit('private message', {
+    socket.to(to).to(socket.userId).emit('private message', {
       content,
       from: socket.id,
+      to,
     })
   })
 })

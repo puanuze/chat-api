@@ -1,11 +1,8 @@
 import { User as UserModel } from '../models'
 
 export type User = {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
-  password: string
+  _id: string
+  username: string
 }
 
 export class UserRepository {
@@ -13,7 +10,7 @@ export class UserRepository {
     return UserModel.create(user)
   }
 
-  static async getUserByEmail(email: string): Promise<User> {
-    return UserModel.findOne({ email }).exec()
+  static async getUserByUsername(username: string): Promise<User> {
+    return UserModel.findOne({ username }).exec()
   }
 }
