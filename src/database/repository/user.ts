@@ -13,4 +13,8 @@ export class UserRepository {
   static async getUserByUsername(username: string): Promise<User> {
     return UserModel.findOne({ username }).exec()
   }
+
+  static async getUserById(id: string): Promise<User> {
+    return UserModel.findOne({ _id: id }).exec()
+  }
 }
