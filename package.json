@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "lint": "eslint 'src/**/*.ts' --fix",
-    "build": "rm -rf ./dist && npm run lint",
+    "build": "rm -rf ./dist && npm run lint && tsc",
     "dev": "nodemon | pino-pretty"
   },
   "keywords": [],
