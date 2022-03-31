@@ -19,7 +19,7 @@ export class MessageRepository {
     const [user1, user2] = [new Types.ObjectId(userIds[0]), new Types.ObjectId(userIds[1])]
 
     return MessageModel.find({
-      $or: [{ sender: user1 }, { sender: user2 }, { to: user1 }, { to: user2 }],
+      $or: [{ $and: [{ sender: user1 }, { to: user2 }] }, { $and: [{ to: user1 }, { to: user2 }] }],
     }).exec()
   }
 }
