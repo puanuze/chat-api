@@ -2,7 +2,13 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 
 import { Server } from 'socket.io'
-import { Message, MessageRepository, SessionRepository, UserRepository } from '../database/repository'
+import {
+  InteractionRepository,
+  Message,
+  MessageRepository,
+  SessionRepository,
+  UserRepository,
+} from '../database/repository'
 
 const io = new Server({
   cors: {
@@ -99,6 +105,22 @@ io.on('connection', async (socket: any) => {
     }
     const message = await MessageRepository.postMessage({ content, sender: socket.userId, to } as Message)
     socket.to(to).emit('private message', message)
+  })
+
+  // Handle interaction
+  socket.on('interaction', async ({ userId, targetUserId }: any) => {
+    if (!userId && !targetUserId) {
+      return
+    }
+
+    const interaction = await InteractionRepository.getUserInteractionWith(userId, targetUserId)
+    let res
+    if (!interaction) {
+      res = await InteractionRepository.createUserInteraction(userId, targetUserId)
+    } else {
+      res = await InteractionRepository.updateUserInteraction(userId, targetUserId)
+    }
+    socket.to(targetUserId).emit('interaction', res)
   })
 })
 
