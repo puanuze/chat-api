@@ -118,7 +118,7 @@ io.on('connection', async (socket: any) => {
     if (!interaction) {
       res = await InteractionRepository.createUserInteraction(userId, targetUserId)
     } else {
-      res = await InteractionRepository.updateUserInteraction(userId, targetUserId)
+      res = await InteractionRepository.updateUserInteraction(interaction._id, userId, targetUserId)
     }
     socket.to(targetUserId).emit('interaction', res)
   })
