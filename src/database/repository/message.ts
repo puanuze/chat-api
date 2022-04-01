@@ -20,6 +20,8 @@ export class MessageRepository {
 
     return MessageModel.find({
       $or: [{ $and: [{ sender: user1 }, { to: user2 }] }, { $and: [{ sender: user2 }, { to: user1 }] }],
-    }).exec()
+    })
+      .sort({ createdAt: -1 })
+      .exec()
   }
 }
