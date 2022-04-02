@@ -1,5 +1,5 @@
 import { Context } from 'koa'
-import { UserRepository } from '../database/repository'
+import { InteractionRepository, UserRepository } from '../database/repository'
 import { UserRegisterValidator } from '../validator'
 import { HttpResponse } from '../utils/types'
 
@@ -22,6 +22,18 @@ export class UserController {
 
     const responseData: HttpResponse = {
       data: user,
+    }
+    response.body = responseData
+  }
+
+  static async getConnectionsForUser(ctx: Context) {
+    const { request, response, params } = ctx
+    const { id } = params
+
+    const connections = await InteractionRepository.getConnectionsForUser(id)
+
+    const responseData: HttpResponse = {
+      data: connections,
     }
     response.body = responseData
   }

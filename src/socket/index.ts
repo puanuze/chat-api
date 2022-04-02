@@ -116,7 +116,10 @@ io.on('connection', async (socket: any) => {
     const interaction = await InteractionRepository.getUserInteractionWith(userId, targetUserId)
     let res
     if (!interaction) {
-      res = await InteractionRepository.createUserInteraction(userId, targetUserId)
+      ;[res] = await Promise.all([
+        InteractionRepository.createUserInteraction(userId, targetUserId, new Date()),
+        InteractionRepository.createUserInteraction(targetUserId, userId, null),
+      ])
     } else {
       res = await InteractionRepository.updateUserInteraction(interaction._id, userId, targetUserId)
     }
