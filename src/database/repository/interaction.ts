@@ -50,7 +50,6 @@ export class InteractionRepository {
         return result
       })
       .exec()
-    console.log(response)
     return Promise.resolve(response)
   }
 }

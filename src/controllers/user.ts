@@ -27,7 +27,7 @@ export class UserController {
   }
 
   static async getConnectionsForUser(ctx: Context) {
-    const { request, response, params } = ctx
+    const { response, params } = ctx
     const { id } = params
 
     const connections = await InteractionRepository.getConnectionsForUser(id)
