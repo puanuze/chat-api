@@ -24,6 +24,6 @@ export class InteractionController {
       }
     }
 
-    response.body = responseData
+    response.body = { data: responseData }
   }
 }
