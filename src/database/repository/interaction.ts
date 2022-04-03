@@ -9,7 +9,7 @@ export class InteractionRepository {
   }
 
   static async updateUserInteraction(id: string, userId: string, targetUserId: string): Promise<any> {
-    return Interaction.updateOne(
+    return Interaction.findOneAndUpdate(
       {
         _id: id,
         userId: new Types.ObjectId(userId),
@@ -18,6 +18,7 @@ export class InteractionRepository {
       {
         lastInteractionTime: new Date(),
       },
+      { new: true },
     )
   }
 
