@@ -2,13 +2,7 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 
 import { Server } from 'socket.io'
-import {
-  InteractionRepository,
-  Message,
-  MessageRepository,
-  SessionRepository,
-  UserRepository,
-} from '../database/repository'
+import { InteractionRepository, Message, MessageRepository, UserRepository } from '../database/repository'
 
 const io = new Server({
   cors: {
@@ -17,33 +11,20 @@ const io = new Server({
 })
 
 io.use(async (socket: any, next) => {
-  const { userId, sessionId } = socket.handshake.auth
+  const { userId } = socket.handshake.auth
+  console.log(`User with id ${userId} connected`)
 
-  if (!userId && !sessionId) {
+  if (!userId) {
     return next(new Error('invalid request'))
   }
 
-  let session
-  if (sessionId) {
-    session = await SessionRepository.findSession(sessionId)
-  } else {
-    session = await SessionRepository.findSessionForUser(userId)
+  const user = await UserRepository.getUserById(userId)
+
+  if (!user) {
+    return next(new Error('invalid request'))
   }
 
-  if (session) {
-    session = session.toJSON()
-    socket.sessionId = session.sessionId
-    socket.userId = session.user._id.toJSON()
-    socket.username = session.user.username
-    return next()
-  }
-
-  // create new session
-  let user: any = null
-  ;[session, user] = await Promise.all([SessionRepository.addSession(userId), UserRepository.getUserById(userId)])
-  session = session.toJSON()
-  socket.sessionId = session.sessionId
-  socket.userId = session.user._id.toJSON()
+  socket.userId = user._id
   socket.username = user.username
 
   return next()
@@ -67,7 +48,6 @@ io.on('connection', async (socket: any) => {
 
   // Emit sessionId and userId
   socket.emit('session', {
-    sessionId: socket.sessionId,
     userId: socket.userId,
     username: socket.username,
   })
