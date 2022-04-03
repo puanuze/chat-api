@@ -1,9 +1,26 @@
+/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
+
 import { Context } from 'koa'
 import { InteractionRepository, UserRepository } from '../database/repository'
 import { UserRegisterValidator } from '../validator'
 import { HttpResponse } from '../utils/types'
 
 export class UserController {
+  static async getUser(ctx: Context) {
+    const { response, params } = ctx
+    const { id } = params
+
+    const existingUser = await UserRepository.getUserById(id)
+
+    const responseData: HttpResponse = {
+      data: {
+        id: existingUser?._id,
+        username: existingUser?.username,
+      },
+    }
+    response.body = responseData
+  }
+
   static async postUser(ctx: Context) {
     const { request, response } = ctx
     const data = { ...request.body }

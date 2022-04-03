@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose'
 
-const userSchema = new Schema({
+export const userSchema = new Schema({
   username: { type: String, required: true },
   session: {
     type: Schema.Types.ObjectId,
