@@ -37,7 +37,7 @@ export class InteractionRepository {
   static async getConnectionsForUser(userId: string): Promise<any> {
     const response = await Interaction.find()
       .select('with')
-      .where({ userId })
+      .where({ userId, with: { $nin: userId } })
       .setOptions({ lean: true })
       .populate('with')
       .transform((res) => {

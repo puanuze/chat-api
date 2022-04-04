@@ -12,7 +12,6 @@ const io = new Server({
 
 io.use(async (socket: any, next) => {
   const { userId } = socket.handshake.auth
-  console.log(`User with id ${userId} connected`)
 
   if (!userId) {
     return next(new Error('invalid request'))
@@ -24,7 +23,7 @@ io.use(async (socket: any, next) => {
     return next(new Error('invalid request'))
   }
 
-  socket.userId = user._id
+  socket.userId = user._id.toJSON()
   socket.username = user.username
 
   return next()
@@ -88,20 +87,23 @@ io.on('connection', async (socket: any) => {
   })
 
   // Handle interaction
-  socket.on('interaction', async ({ userId, targetUserId }: any) => {
-    if (!userId && !targetUserId) {
+  socket.on('interaction', async ({ userId, targetUserId, isInitialization }: any) => {
+    if ((!targetUserId && !userId) || userId === targetUserId) {
       return
     }
 
-    const interaction = await InteractionRepository.getUserInteractionWith(userId, targetUserId)
+    if (isInitialization) {
+      await InteractionRepository.createUserInteraction(socket.userId, targetUserId, null)
+      return
+    }
+
+    const interaction = await InteractionRepository.getUserInteractionWith(socket.userId, targetUserId)
+
     let res
     if (!interaction) {
-      ;[res] = await Promise.all([
-        InteractionRepository.createUserInteraction(userId, targetUserId, new Date()),
-        InteractionRepository.createUserInteraction(targetUserId, userId, null),
-      ])
+      res = await InteractionRepository.createUserInteraction(socket.userId, targetUserId, new Date())
     } else {
-      res = await InteractionRepository.updateUserInteraction(interaction._id, userId, targetUserId)
+      res = await InteractionRepository.updateUserInteraction(interaction._id, socket.userId, targetUserId)
     }
     socket.to(targetUserId).emit('interaction', res)
   })

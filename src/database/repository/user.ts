@@ -14,7 +14,7 @@ export class UserRepository {
     return UserModel.findOne({ username }).exec()
   }
 
-  static async getUserById(id: string): Promise<User> {
+  static async getUserById(id: string): Promise<any> {
     return UserModel.findOne({ _id: id }).exec()
   }
 }
